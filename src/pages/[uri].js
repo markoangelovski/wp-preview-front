@@ -1,35 +1,43 @@
 import { gql } from "@apollo/client";
-import { getClient } from "@/lib/apollo";
+import { client, getClient } from "@/lib/apollo";
 import PostLayout from "@/components/Post/PostLayout";
+import GqlQuery from "@/components/GqlQuery/GqlQuery";
 
-export default function Post({ post }) {
-  return <PostLayout post={post} />;
+export default function Post({ post, gqlQuery }) {
+  return (
+    <>
+      <PostLayout post={post} />
+      <GqlQuery gqlQuery={gqlQuery} />
+    </>
+  );
 }
 
 export const getServerSideProps = async ({ params, query }) => {
   const { uri } = params;
   const { preview, preview_id } = query;
 
-  const GET_POST_BY_URI = gql`
+  const GET_POST_BY_URI = `
     query GetPostByURI($id: ID!) {
       post(id: $id, idType: URI) {
-        title
-        content
         uri
+        id
         slug
         status
+        title
+        content
       }
     }
   `;
 
-  const GET_PREVIEW_POST_BY_URI = gql`
+  const GET_PREVIEW_POST_BY_URI = `
     query GetPostByURI($id: ID!) {
       post(id: $id, idType: DATABASE_ID, asPreview: true) {
-        title
-        content
         uri
+        id
         slug
         status
+        title
+        content
       }
     }
   `;
@@ -40,12 +48,18 @@ export const getServerSideProps = async ({ params, query }) => {
   const gqlQuery = isPreview ? GET_PREVIEW_POST_BY_URI : GET_POST_BY_URI;
   const id = isPreview ? preview_id : uri;
 
-  const { data } = await getClient((isPreview || isPending) && "auth").query({
-    query: gqlQuery,
-    variables: {
-      id
-    }
+  const variables = {
+    id
+  };
+
+  const { data } = await client.query({
+    query: gql`
+      ${gqlQuery}
+    `,
+    variables
   });
 
-  return { props: { post: data.post } };
+  return {
+    props: { post: data.post, gqlQuery: { query: gqlQuery, variables } }
+  };
 };

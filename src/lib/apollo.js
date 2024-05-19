@@ -15,20 +15,16 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-export const getClient = (withAuth) => {
-  const isAuth = withAuth === "auth";
-
-  return new ApolloClient({
-    ssrMode: typeof window === "undefined",
-    link: isAuth ? authLink.concat(httpLink) : httpLink,
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      watchQuery: {
-        fetchPolicy: "no-cache" // Bypass cache for watch queries
-      },
-      query: {
-        fetchPolicy: "no-cache" // Bypass cache for queries
-      }
+export const client = new ApolloClient({
+  ssrMode: typeof window === "undefined",
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "no-cache" // Bypass cache for watch queries
+    },
+    query: {
+      fetchPolicy: "no-cache" // Bypass cache for queries
     }
-  });
-};
+  }
+});

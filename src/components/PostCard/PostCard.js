@@ -1,7 +1,6 @@
 import React from "react";
 
 const PostCard = ({ post }) => {
-  console.log("post_ ", post);
   return (
     <a
       key={post.uri}
@@ -18,8 +17,10 @@ const PostCard = ({ post }) => {
         className={`m-0 max-w-[30ch] text-sm opacity-50`}
         dangerouslySetInnerHTML={{ __html: post.content }}
       ></div>
+      <div className={`m-0 max-w-[30ch] text-sm`}>ID: {post.id}</div>
       <div className={`m-0 max-w-[30ch] text-sm`}>URI: {post.uri}</div>
       <div className={`m-0 max-w-[30ch] text-sm`}>slug: {post.slug}</div>
+      <div className={`m-0 max-w-[30ch] text-sm`}>status: {post.status}</div>
     </a>
   );
 };

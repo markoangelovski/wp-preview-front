@@ -1,5 +1,5 @@
 {
-  "name": "headless-preview-page",
+  "name": "wp-preview-front",
   "version": "0.1.0",
   "private": true,
   "scripts": {
