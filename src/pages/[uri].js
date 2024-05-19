@@ -43,7 +43,6 @@ export const getServerSideProps = async ({ params, query }) => {
   `;
 
   const isPreview = preview === "true" && preview_id;
-  const isPending = preview === "true";
 
   const gqlQuery = isPreview ? GET_PREVIEW_POST_BY_URI : GET_POST_BY_URI;
   const id = isPreview ? preview_id : uri;

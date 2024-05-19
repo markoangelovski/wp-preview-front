@@ -1,5 +1,3 @@
-import React from "react";
-
 const GqlQuery = ({ gqlQuery }) => {
   const { query, variables } = gqlQuery;
   return (
