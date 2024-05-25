@@ -24,7 +24,8 @@ const PostCard = ({ ct }) => {
           <div className="flex">
             <img
               style={{
-                width: ct.featuredImage.node.mediaDetails.width / 4
+                width: ct.featuredImage.node.mediaDetails.width / 4,
+                height: ct.featuredImage.node.mediaDetails.height / 4
               }}
               src={ct.featuredImage.node.link}
               className="mr-4"
