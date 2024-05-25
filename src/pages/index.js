@@ -12,7 +12,7 @@ export default function Home({ pageStgProdPairs, gqlQuery }) {
   );
 }
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async ({ res }) => {
   const GET_ALL_CTS = `
     query GetAllCTs {
       posts {
@@ -111,6 +111,8 @@ export const getServerSideProps = async () => {
       });
     }
   );
+
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
 
   return {
     props: {
