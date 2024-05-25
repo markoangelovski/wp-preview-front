@@ -1,105 +1,84 @@
 import { gql } from "@apollo/client";
 import { client } from "@/lib/apollo";
 import HomeLayout from "@/components/Home/HomeLayout";
-import PostLayout from "@/components/Post/PostLayout";
 import GqlQuery from "@/components/GqlQuery/GqlQuery";
 
-export default function Home({
-  post,
-  posts,
-  pendingPosts,
-  draftPosts,
-  gqlQuery
-}) {
-  if (post)
-    return (
-      <>
-        <PostLayout post={post} />
-        <GqlQuery gqlQuery={gqlQuery} />
-      </>
-    );
-
+export default function Home({ pageStgProdPairs, gqlQuery }) {
   return (
     <>
-      <HomeLayout
-        draftPosts={draftPosts}
-        pendingPosts={pendingPosts}
-        posts={posts}
-      />
+      <HomeLayout pageStgProdPairs={pageStgProdPairs} />
       <GqlQuery gqlQuery={gqlQuery} />
     </>
   );
 }
 
-export const getServerSideProps = async ({ query }) => {
-  // When the post is in Draft or Pending, the Preview button in Wordpress will link to {{host}}/p={{postId}}&preview=true
-  const { p, preview } = query;
-
-  if (p) {
-    const GET_PENDING_POST_BY_URI = `
-      query GetPostByURI($id: ID!, $asPreview: Boolean!) {
-        post(id: $id, idType: DATABASE_ID, asPreview: $asPreview) {
-          uri
-          id
-          slug
-          status
-          title
-          content
-        }
-      }
-    `;
-
-    const variables = {
-      id: p,
-      asPreview: preview === "true"
-    };
-
-    const { data } = await client.query({
-      query: gql`
-        ${GET_PENDING_POST_BY_URI}
-      `,
-      variables
-    });
-
-    if (data?.post)
-      return {
-        props: {
-          post: data.post,
-          gqlQuery: { query: GET_PENDING_POST_BY_URI, variables }
-        }
-      };
-  }
-
-  const GET_ALL_POSTS = `
-    query GetAllPosts {
-      draftPosts: posts(where: { status: DRAFT }) {
-        nodes {
-          id
-          uri
-          slug
-          status
-          title
-          content
-        }
-      }
-      pendingPosts: posts(where: { status: PENDING }) {
-        nodes {
-          id
-          uri
-          slug
-          status
-          title
-          content
-        }
-      }
+export const getServerSideProps = async () => {
+  const GET_ALL_CTS = `
+    query GetAllCTs {
       posts {
         nodes {
-          id
-          uri
           slug
-          status
-          title
-          content
+          contentTypeName
+          pageVisibility {
+            displayOnLive
+          }
+          revisions {
+            nodes {
+              pageStatus {
+                pageStatus
+              }
+              title
+              content
+            }
+          }
+        }
+      }
+      pages {
+        nodes {
+          slug
+          contentTypeName
+          pageVisibility {
+            displayOnLive
+          }
+          revisions {
+            nodes {
+              pageStatus {
+                pageStatus
+              }
+              title
+              content
+            }
+          }
+        }
+      }
+      movies {
+        nodes {
+          slug
+          contentTypeName
+          pageVisibility {
+            displayOnLive
+          }
+          revisions {
+            nodes {
+              pageStatus {
+                pageStatus
+              }
+              title
+              movieDetails {
+                title
+                excerpt
+              }
+              featuredImage {
+                node {
+                  link
+                  mediaDetails {
+                    height
+                    width
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -107,16 +86,36 @@ export const getServerSideProps = async ({ query }) => {
 
   const { data } = await client.query({
     query: gql`
-      ${GET_ALL_POSTS}
+      ${GET_ALL_CTS}
     `
   });
 
+  const pageStgProdPairs = [];
+
+  [...data.posts.nodes, ...data.pages.nodes, ...data.movies.nodes].forEach(
+    (ct) => {
+      const stgCt = ct.revisions.nodes.find(
+        (node) => node.pageStatus.pageStatus[0] === "staging"
+      );
+      const prodCt = ct.revisions.nodes.find(
+        (node) => node.pageStatus.pageStatus[0] === "production"
+      );
+
+      pageStgProdPairs.push({
+        slug: ct.slug,
+        type: ct.contentTypeName,
+        visibility: ct.pageVisibility.displayOnLive,
+        staging: stgCt,
+        production: ct.pageVisibility.displayOnLive && prodCt ? prodCt : null,
+        raw: ct
+      });
+    }
+  );
+
   return {
     props: {
-      draftPosts: data.draftPosts,
-      pendingPosts: data.pendingPosts,
-      posts: data.posts,
-      gqlQuery: { query: GET_ALL_POSTS }
+      pageStgProdPairs,
+      gqlQuery: { query: GET_ALL_CTS }
     }
   };
 };

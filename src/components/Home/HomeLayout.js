@@ -1,44 +1,47 @@
+import React from "react";
 import PostCard from "../PostCard/PostCard";
-
-const HomeLayout = ({ draftPosts, pendingPosts, posts }) => {
+const HomeLayout = ({ pageStgProdPairs }) => {
   return (
-    <>
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          def Draft posts {draftPosts.nodes.length} (requires authentication):
-        </p>
-      </div>
+    <div className="">
+      {pageStgProdPairs.map((pair) => (
+        <div key={pair.slug}>
+          <div className="grid grid-cols-2 gap-4">
+            <p>Staging</p>
+            <p>Production</p>
+          </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        {draftPosts.nodes.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+          {/* Staging */}
+          <div className="grid grid-cols-2 gap-4">
+            <PostCard
+              ct={{
+                slug: pair.slug,
+                type: pair.type,
+                title: pair.staging.title,
+                content: pair.staging.content,
+                movieDetails: pair.staging.movieDetails,
+                featuredImage: pair.staging.featuredImage,
+                raw: pair.raw
+              }}
+            />
 
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Pending posts {pendingPosts.nodes.length} (requires authentication):
-        </p>
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        {pendingPosts.nodes.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
-
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Published posts {posts.nodes.length} :
-        </p>
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        {posts.nodes.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
-    </>
+            {/* Production */}
+            {pair.visibility && pair.production && (
+              <PostCard
+                ct={{
+                  slug: pair.slug,
+                  type: pair.type,
+                  title: pair.production.title,
+                  content: pair.production.content,
+                  movieDetails: pair.production.movieDetails,
+                  featuredImage: pair.production.featuredImage,
+                  raw: pair.raw
+                }}
+              />
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 

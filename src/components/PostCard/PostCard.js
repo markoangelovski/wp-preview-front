@@ -1,27 +1,40 @@
-import React from "react";
+import Accordion from "../Accordion/Accordion";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ ct }) => {
   return (
-    <a
-      key={post.uri}
-      href={post.uri}
-      className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-    >
-      <h2 className={`mb-3 text-2xl font-semibold`}>
-        {post.title}{" "}
-        <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-          -&gt;
-        </span>
-      </h2>
+    <div className="rounded-lg  py-6 pr-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white">
+      <h5 className="mb-2 text-xl font-medium leading-tight">
+        Slug: {ct.slug}
+      </h5>
+      <h5 className="mb-2 text-xl font-medium leading-tight">
+        Type: {ct.type}
+      </h5>
+      <h6 className="mb-2 text-xl font-medium leading-tight">
+        Title: {ct.title}
+      </h6>
       <div
-        className={`m-0 max-w-[30ch] text-sm opacity-50`}
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        className="mb-4 text-base"
+        dangerouslySetInnerHTML={{ __html: ct.content }}
       ></div>
-      <div className={`m-0 max-w-[30ch] text-sm`}>ID: {post.id}</div>
-      <div className={`m-0 max-w-[30ch] text-sm`}>URI: {post.uri}</div>
-      <div className={`m-0 max-w-[30ch] text-sm`}>slug: {post.slug}</div>
-      <div className={`m-0 max-w-[30ch] text-sm`}>status: {post.status}</div>
-    </a>
+      {ct.movieDetails && (
+        <>
+          <h6 className="mb-2 text-xl font-medium leading-tight">
+            Movie title: {ct.movieDetails.title}
+          </h6>
+          <div className="flex">
+            <img
+              style={{
+                width: ct.featuredImage.node.mediaDetails.width / 4
+              }}
+              src={ct.featuredImage.node.link}
+              className="mr-4"
+            />
+            <p className="mb-4 text-base">{ct.movieDetails.excerpt}</p>
+          </div>
+        </>
+      )}
+      <Accordion payload={ct.raw} />
+    </div>
   );
 };
 
